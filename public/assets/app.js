@@ -24,21 +24,120 @@ function formatearTexto(texto) {
         '"': '&quot;',
         "'": '&#39;',
     };
-    let seguro = texto.replace(/[&<>"']/g, (c) => mapa[c]);
-    seguro = seguro.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
-    seguro = seguro.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-    seguro = seguro.replace(/\*(.+?)\*/g, '<em>$1</em>');
-    seguro = seguro.replace(/```(.+?)```/gs, '<code>$1</code>');
-    seguro = seguro.replace(/`(.+?)`/g, '<code>$1</code>');
-    seguro = seguro.replace(/\n/g, '<br>');
-    return seguro;
+    const escapado = texto.replace(/[&<>"']/g, (c) => mapa[c]);
+
+    let dentroListaOl = false;
+    let dentroListaUl = false;
+    let dentroBloqueCodigo = false;
+
+    const lineas = escapado.split('\n');
+    const bloques = [];
+
+    for (let i = 0; i < lineas.length; i++) {
+        let linea = lineas[i];
+
+        if (linea.startsWith('```')) {
+            if (!dentroBloqueCodigo) {
+                dentroBloqueCodigo = true;
+                bloques.push('<pre><code>');
+                continue;
+            } else {
+                dentroBloqueCodigo = false;
+                bloques.push('</code></pre>');
+                continue;
+            }
+        }
+
+        if (dentroBloqueCodigo) {
+            bloques.push(linea + '\n');
+            continue;
+        }
+
+        if (/^#{1,3}\s/.test(linea)) {
+            cerrarListas();
+            const nivel = linea.match(/^(#+)\s/)[1].length;
+            const contenido = linea.replace(/^#+\s/, '');
+            const etiqueta = 'h' + nivel;
+            bloques.push('<' + etiqueta + '>' + inline(contenido) + '</' + etiqueta + '>');
+            continue;
+        }
+
+        if (/^___$|^---$|^\*\*\*$/.test(linea.trim())) {
+            cerrarListas();
+            bloques.push('<hr>');
+            continue;
+        }
+
+        if (/^\d+\.\s/.test(linea)) {
+            if (!dentroListaOl) {
+                cerrarListas();
+                dentroListaOl = true;
+                bloques.push('<ol>');
+            }
+            const contenido = linea.replace(/^\d+\.\s/, '');
+            bloques.push('<li>' + inline(contenido) + '</li>');
+            continue;
+        }
+
+        if (/^[-*]\s/.test(linea)) {
+            if (!dentroListaUl) {
+                cerrarListas();
+                dentroListaUl = true;
+                bloques.push('<ul>');
+            }
+            const contenido = linea.replace(/^[-*]\s/, '');
+            bloques.push('<li>' + inline(contenido) + '</li>');
+            continue;
+        }
+
+        if (/^>\s/.test(linea)) {
+            cerrarListas();
+            const contenido = linea.replace(/^>\s/, '');
+            bloques.push('<blockquote>' + inline(contenido) + '</blockquote>');
+            continue;
+        }
+
+        cerrarListas();
+
+        if (linea.trim() === '') {
+            bloques.push('<br>');
+        } else {
+            bloques.push('<p>' + inline(linea) + '</p>');
+        }
+    }
+
+    cerrarListas();
+    if (dentroBloqueCodigo) {
+        bloques.push('</code></pre>');
+    }
+
+    return bloques.join('');
+
+    function cerrarListas() {
+        if (dentroListaOl) {
+            bloques.push('</ol>');
+            dentroListaOl = false;
+        }
+        if (dentroListaUl) {
+            bloques.push('</ul>');
+            dentroListaUl = false;
+        }
+    }
+
+    function inline(texto) {
+        return texto
+            .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.+?)\*/g, '<em>$1</em>')
+            .replace(/`(.+?)`/g, '<code>$1</code>');
+    }
 }
 
 function crearBurbuja(texto, autor, tipo) {
     const articulo = document.createElement('article');
     const burbuja = document.createElement('div');
     const nombre = document.createElement('p');
-    const contenido = document.createElement('p');
+    const contenido = document.createElement('div');
 
     articulo.className = autor === 'usuario'
         ? 'flex justify-end'
@@ -68,7 +167,7 @@ function crearBurbuja(texto, autor, tipo) {
             ? 'Error'
             : 'Asistente';
 
-    contenido.className = 'mt-1 leading-relaxed';
+    contenido.className = 'mt-1 leading-relaxed [&_h1]:text-lg [&_h1]:font-bold [&_h2]:text-base [&_h2]:font-bold [&_h3]:text-sm [&_h3]:font-bold [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mt-1 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_pre]:bg-slate-200 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:text-sm [&_code]:bg-slate-200 [&_code]:px-1 [&_code]:rounded [&_code]:text-sm [&_hr]:my-3 [&_hr]:border-slate-300 [&_hr]:border-t [&_p]:mt-1';
 
     if (autor === 'asistente' && tipo !== 'error') {
         contenido.innerHTML = formatearTexto(texto);
