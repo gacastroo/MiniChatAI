@@ -45,7 +45,7 @@ spl_autoload_register(
 );
 
 /**
- * Devuelve una respuesta JSON y termina la ejecuciÃƒÂ³n.
+ * Devuelve una respuesta JSON y termina la ejecución.
  *
  * @param array<string, mixed> $cuerpo
  */
@@ -93,7 +93,7 @@ if ($contenido === false) {
         400,
         [
             'ok' => false,
-            'error' => 'No se pudo leer la peticiÃƒÂ³n.',
+            'error' => 'No se pudo leer la petición.',
         ]
     );
 }
@@ -112,7 +112,7 @@ try {
         400,
         [
             'ok' => false,
-            'error' => 'La peticiÃƒÂ³n contiene JSON no vÃƒÂ¡lido.',
+            'error' => 'La petición contiene JSON no válido.',
         ]
     );
 }
@@ -122,7 +122,7 @@ if (!is_array($entrada)) {
         400,
         [
             'ok' => false,
-            'error' => 'La peticiÃƒÂ³n debe contener un objeto JSON.',
+            'error' => 'La petición debe contener un objeto JSON.',
         ]
     );
 }

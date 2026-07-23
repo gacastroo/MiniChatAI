@@ -61,7 +61,6 @@ function desplazarAlFinal() {
 function cambiarEstadoCarga(cargando) {
     campoMensaje.disabled = cargando;
     botonEnviar.disabled = cargando;
-    botonReiniciar.disabled = cargando;
 
     botonEnviar.classList.toggle('opacity-50', cargando);
     botonEnviar.classList.toggle('cursor-not-allowed', cargando);
