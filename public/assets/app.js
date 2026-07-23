@@ -16,6 +16,24 @@ function actualizarContador() {
 
 campoMensaje.addEventListener('input', actualizarContador);
 
+function formatearTexto(texto) {
+    const mapa = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+    };
+    let seguro = texto.replace(/[&<>"']/g, (c) => mapa[c]);
+    seguro = seguro.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    seguro = seguro.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    seguro = seguro.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    seguro = seguro.replace(/```(.+?)```/gs, '<code>$1</code>');
+    seguro = seguro.replace(/`(.+?)`/g, '<code>$1</code>');
+    seguro = seguro.replace(/\n/g, '<br>');
+    return seguro;
+}
+
 function crearBurbuja(texto, autor, tipo) {
     const articulo = document.createElement('article');
     const burbuja = document.createElement('div');
@@ -50,8 +68,13 @@ function crearBurbuja(texto, autor, tipo) {
             ? 'Error'
             : 'Asistente';
 
-    contenido.className = 'mt-1 leading-relaxed whitespace-pre-wrap';
-    contenido.textContent = texto;
+    contenido.className = 'mt-1 leading-relaxed';
+
+    if (autor === 'asistente' && tipo !== 'error') {
+        contenido.innerHTML = formatearTexto(texto);
+    } else {
+        contenido.textContent = texto;
+    }
 
     burbuja.appendChild(nombre);
     burbuja.appendChild(contenido);
