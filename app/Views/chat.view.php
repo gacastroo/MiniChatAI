@@ -31,14 +31,14 @@
                 type="button"
                 class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-50"
             >
-                Nueva conversación
+                Nueva conversaciÃ³n
             </button>
         </header>
 
         <section
             id="mensajes"
             aria-live="polite"
-            aria-label="Historial de conversación"
+            aria-label="Historial de conversaciÃ³n"
             class="flex flex-1 flex-col gap-4 overflow-y-auto rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
         >
             <article class="flex justify-start">
@@ -48,7 +48,7 @@
                     </p>
 
                     <p class="mt-1">
-                        Hola. Soy MiniChatGPT. Todavía estoy en la fase de maquetación.
+                        Hola. Soy MiniChatGPT. TodavÃ­a estoy en la fase de maquetaciÃ³n.
                     </p>
                 </div>
             </article>
@@ -56,11 +56,11 @@
             <article class="flex justify-end">
                 <div class="max-w-[80%] rounded-2xl rounded-br-md bg-blue-600 px-4 py-3 text-white">
                     <p class="text-sm font-semibold text-blue-100">
-                        Tú
+                        TÃº
                     </p>
 
                     <p class="mt-1">
-                        Perfecto, ya puedo ver cómo quedará la conversación.
+                        Perfecto, ya puedo ver cÃ³mo quedarÃ¡ la conversaciÃ³n.
                     </p>
                 </div>
             </article>
@@ -97,5 +97,6 @@
             class="mt-2 min-h-5 text-sm text-slate-500"
         ></p>
     </main>
+    <script src="assets/app.js"></script>
 </body>
 </html>
