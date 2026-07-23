@@ -6,8 +6,17 @@ const botonEnviar = document.getElementById('boton-enviar');
 const botonReiniciar = document.getElementById('boton-reiniciar');
 const zonaMensajes = document.getElementById('mensajes');
 const estadoChat = document.getElementById('estado-chat');
+const indicadorEscribiendo = document.getElementById('indicador-escribiendo');
+const contadorCaracteres = document.getElementById('contador-caracteres');
 
-function crearBurbuja(texto, autor, tipo = 'normal') {
+function actualizarContador() {
+    const len = campoMensaje.value.length;
+    contadorCaracteres.textContent = len + ' / 2000';
+}
+
+campoMensaje.addEventListener('input', actualizarContador);
+
+function crearBurbuja(texto, autor, tipo) {
     const articulo = document.createElement('article');
     const burbuja = document.createElement('div');
     const nombre = document.createElement('p');
@@ -20,7 +29,7 @@ function crearBurbuja(texto, autor, tipo = 'normal') {
     if (tipo === 'error') {
         burbuja.className =
             'max-w-[80%] rounded-2xl rounded-bl-md ' +
-            'bg-red-100 px-4 py-3 text-red-900';
+            'bg-red-50 px-4 py-3 text-red-800 border border-red-200';
     } else if (autor === 'usuario') {
         burbuja.className =
             'max-w-[80%] rounded-2xl rounded-br-md ' +
@@ -28,7 +37,7 @@ function crearBurbuja(texto, autor, tipo = 'normal') {
     } else {
         burbuja.className =
             'max-w-[80%] rounded-2xl rounded-bl-md ' +
-            'bg-slate-200 px-4 py-3 text-slate-900';
+            'bg-slate-100 px-4 py-3 text-slate-800';
     }
 
     nombre.className = autor === 'usuario'
@@ -41,7 +50,7 @@ function crearBurbuja(texto, autor, tipo = 'normal') {
             ? 'Error'
             : 'Asistente';
 
-    contenido.className = 'mt-1 whitespace-pre-wrap';
+    contenido.className = 'mt-1 leading-relaxed whitespace-pre-wrap';
     contenido.textContent = texto;
 
     burbuja.appendChild(nombre);
@@ -64,6 +73,12 @@ function cambiarEstadoCarga(cargando) {
 
     botonEnviar.classList.toggle('opacity-50', cargando);
     botonEnviar.classList.toggle('cursor-not-allowed', cargando);
+
+    if (cargando) {
+        indicadorEscribiendo.classList.remove('hidden');
+    } else {
+        indicadorEscribiendo.classList.add('hidden');
+    }
 }
 
 async function enviarPeticion(datos) {
@@ -112,10 +127,12 @@ formulario.addEventListener('submit', async (evento) => {
         return;
     }
 
+    estadoChat.textContent = '';
+
     crearBurbuja(mensaje, 'usuario');
 
     campoMensaje.value = '';
-    estadoChat.textContent = 'Escribiendo…';
+    actualizarContador();
     cambiarEstadoCarga(true);
 
     try {
@@ -127,8 +144,6 @@ formulario.addEventListener('submit', async (evento) => {
             resultado.respuesta,
             'asistente'
         );
-
-        estadoChat.textContent = '';
     } catch (error) {
         crearBurbuja(
             error instanceof Error
@@ -137,8 +152,6 @@ formulario.addEventListener('submit', async (evento) => {
             'asistente',
             'error'
         );
-
-        estadoChat.textContent = '';
     } finally {
         cambiarEstadoCarga(false);
         campoMensaje.focus();
@@ -155,7 +168,7 @@ botonReiniciar.addEventListener('click', async () => {
         });
 
         zonaMensajes.replaceChildren();
-        estadoChat.textContent = 'Conversación reiniciada.';
+        estadoChat.textContent = '';
     } catch (error) {
         crearBurbuja(
             error instanceof Error
@@ -164,12 +177,28 @@ botonReiniciar.addEventListener('click', async () => {
             'asistente',
             'error'
         );
-
-        estadoChat.textContent = '';
     } finally {
         cambiarEstadoCarga(false);
         campoMensaje.focus();
     }
+
+    const bienvenida = document.createElement('article');
+    const burbuja = document.createElement('div');
+    const nombre = document.createElement('p');
+    const contenido = document.createElement('p');
+
+    bienvenida.className = 'flex justify-start';
+    burbuja.className = 'max-w-[80%] rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3';
+    nombre.className = 'text-sm font-semibold text-slate-600';
+    nombre.textContent = 'Asistente';
+    contenido.className = 'mt-1 leading-relaxed';
+    contenido.textContent = '¡Hola! Soy MiniChatGPT, un chat conectado a un modelo de lenguaje a través de OpenRouter. Puedes preguntarme lo que quieras.';
+
+    burbuja.appendChild(nombre);
+    burbuja.appendChild(contenido);
+    bienvenida.appendChild(burbuja);
+    zonaMensajes.appendChild(bienvenida);
+    desplazarAlFinal();
 });
 
 campoMensaje.addEventListener('keydown', (evento) => {
