@@ -90,12 +90,29 @@ function formatearTexto(texto) {
             continue;
         }
 
-        if (/^>\s/.test(linea)) {
+        if (/^\|.+\|$/.test(linea.trim())) {
             cerrarListas();
-            const contenido = linea.replace(/^>\s/, '');
-            bloques.push('<blockquote>' + inline(contenido) + '</blockquote>');
+            if (linea.trim().match(/^\|[-:\s]+\|[-:\s|]+\|?$/)) {
+                continue;
+            }
+            const celdas = linea.split('|').filter(c => c.trim() !== '');
+            const esCabecera = !i || !lineas[i - 1] || !/^\|.+\|$/.test(lineas[i - 1].trim()) || lineas[i - 1].trim().match(/^\|[-:\s]+\|[-:\s|]+\|?$/);
+            const etiqueta = esCabecera ? 'th' : 'td';
+            const fila = celdas.map(c => '<' + etiqueta + '>' + inline(c.trim()) + '</' + etiqueta + '>').join('');
+            bloques.push('<tr>' + fila + '</tr>');
+            if (esCabecera) {
+                bloques.unshift('<table><thead>');
+                if (lineas[i - 1] && lineas[i - 1].trim().match(/^\|[-:\s]+\|[-:\s|]+\|?$/)) {
+                    bloques.push('</thead><tbody>');
+                }
+            }
+            if (!lineas[i + 1] || !/^\|.+\|$/.test(lineas[i + 1].trim()) || lineas[i + 1].trim().match(/^\|[-:\s]+\|[-:\s|]+\|?$/)) {
+                bloques.push('</tbody></table>');
+            }
             continue;
         }
+
+        if (/^>\s/.test(linea)) {
 
         cerrarListas();
 
@@ -167,7 +184,7 @@ function crearBurbuja(texto, autor, tipo) {
             ? 'Error'
             : 'Asistente';
 
-    contenido.className = 'mt-1 leading-relaxed [&_h1]:text-lg [&_h1]:font-bold [&_h2]:text-base [&_h2]:font-bold [&_h3]:text-sm [&_h3]:font-bold [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mt-1 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_pre]:bg-slate-200 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:text-sm [&_code]:bg-slate-200 [&_code]:px-1 [&_code]:rounded [&_code]:text-sm [&_hr]:my-3 [&_hr]:border-slate-300 [&_hr]:border-t [&_p]:mt-1';
+    contenido.className = 'mt-1 leading-relaxed [&_h1]:text-lg [&_h1]:font-bold [&_h2]:text-base [&_h2]:font-bold [&_h3]:text-sm [&_h3]:font-bold [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li]:mt-1 [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-3 [&_blockquote]:italic [&_blockquote]:text-slate-600 [&_pre]:bg-slate-200 [&_pre]:p-3 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:text-sm [&_code]:bg-slate-200 [&_code]:px-1 [&_code]:rounded [&_code]:text-sm [&_hr]:my-3 [&_hr]:border-slate-300 [&_hr]:border-t [&_p]:mt-1 [&_table]:w-full [&_table]:border-collapse [&_table]:my-2 [&_th]:border [&_th]:border-slate-300 [&_th]:bg-slate-100 [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_th]:text-sm [&_th]:font-semibold [&_td]:border [&_td]:border-slate-300 [&_td]:px-3 [&_td]:py-2 [&_td]:text-sm';
 
     if (autor === 'asistente' && tipo !== 'error') {
         contenido.innerHTML = formatearTexto(texto);
