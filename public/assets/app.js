@@ -81,7 +81,7 @@ function cambiarEstadoCarga(cargando) {
     }
 }
 
-async function enviarPeticion(datos) {
+async function enviarPeticion(datos, intento = 0) {
     const respuesta = await fetch('chat.php', {
         method: 'POST',
         headers: {
@@ -101,9 +101,14 @@ async function enviarPeticion(datos) {
     }
 
     if (!respuesta.ok || cuerpo.ok !== true) {
-        throw new Error(
-            cuerpo.error || 'No se pudo completar la petición.'
-        );
+        const errorMsg = cuerpo.error || 'No se pudo completar la petición.';
+
+        if (respuesta.status === 504 && intento < 1) {
+            estadoChat.textContent = 'El servidor tardó demasiado. Reintentando…';
+            return enviarPeticion(datos, intento + 1);
+        }
+
+        throw new Error(errorMsg);
     }
 
     return cuerpo;
