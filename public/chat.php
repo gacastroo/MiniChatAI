@@ -138,9 +138,14 @@ try {
 
     $conversacion = new Conversacion();
 
+    $urlApi = Config::obtener(
+        'API_URL'
+    );
+
     $clienteLLM = new ClienteLLM(
         $apiKey,
-        $modelo
+        $modelo,
+        $urlApi
     );
 
     $controlador = new ChatController(

@@ -9,12 +9,10 @@ use RuntimeException;
 
 final class ClienteLLM
 {
-    private const URL_OPENROUTER =
-        'https://openrouter.ai/api/v1/chat/completions';
-
     public function __construct(
         private string $apiKey,
-        private string $modelo
+        private string $modelo,
+        private string $url
     ) {
     }
 
@@ -34,7 +32,7 @@ final class ClienteLLM
 
         $cuerpo = $this->crearCuerpoJson($mensajes);
 
-        $curl = curl_init(self::URL_OPENROUTER);
+        $curl = curl_init($this->url);
 
         if ($curl === false) {
             throw new RuntimeException(
