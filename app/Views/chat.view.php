@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MiniChatGPT</title>
+    <script>
+        const warnOriginal = console.warn;
+        console.warn = function () {
+            if (arguments[0] && typeof arguments[0] === 'string' &&
+                arguments[0].includes('should not be used in production')) {
+                return;
+            }
+            warnOriginal.apply(console, arguments);
+        };
+    </script>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
