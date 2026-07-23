@@ -1,0 +1,4 @@
+﻿.env
+/vendor/
+.DS_Store
+cache_modelos_openrouter.json
