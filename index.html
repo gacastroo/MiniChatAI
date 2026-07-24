@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Veterinaria Amiga</title>
+    <style>
+        /* --- Reset básico --- */
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:Arial,Helvetica,sans-serif;background:#f5f5f5;}
+        /* --- Navegación --- */
+        nav{
+            background:#2c3e50;
+            color:#fff;
+            padding:.8rem 1rem;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+        nav ul{
+            list-style:none;
+            display:flex;
+            gap:1rem;
+        }
+        nav a{
+            color:#fff;
+            text-decoration:none;
+        }
+        /* --- Header --- */
+        header{
+            background:#3498db;
+            color:#fff;
+            text-align:center;
+            padding:3rem 1rem;
+        }
+        header h1{font-size:2.5rem;}
+        /* --- Secciones principales --- */
+        main{
+            max-width:1000px;
+            margin:2rem auto;
+            padding:0 1rem;
+        }
+        section{
+            background:#fff;
+            padding:1.5rem;
+            margin-bottom:2rem;
+            border-radius:5px;
+            box-shadow:0 2px 5px rgba(0,0,0,.1);
+        }
+        h2{
+            border-bottom:2px solid #3498db;
+            padding-bottom:.5rem;
+            margin-bottom:1rem;
+        }
+        form input,
+        form textarea{
+            width:100%;
+            padding:.6rem;
+            margin:.5rem 0;
+            border:1px solid #ccc;
+            border-radius:4px;
+        }
+        button{
+            background:#27ae60;
+            color:#fff;
+            border:none;
+            padding:.6rem 1.2rem;
+            border-radius:4px;
+            cursor:pointer;
+        }
+        button:hover{background:#219150;}
+        /* --- Chat --- */
+        #chatBox{
+            display:none;
+            height:300px;
+            overflow-y:auto;
+            border:1px solid #ccc;
+            background:#fafafa;
+            margin-top:.5rem;
+        }
+        #chatBox.show{display:block;}
+        /* --- Footer --- */
+        footer{
+            background:#2c3e50;
+            color:#fff;
+            text-align:center;
+            padding:1rem;
+            margin-top:2rem;
+        }
+        /* --- Botón flotante para el chat --- */
+        #chatToggle{
+            position:fixed;
+            bottom:20px;
+            right:20px;
+            background:#e74c3c;
+            color:#fff;
+            border:none;
+            padding:.8rem 1rem;
+            border-radius:50%;
+            cursor:pointer;
+            font-size:1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navegación -->
+<nav>
+    <ul>
+        <li><a href="#formulario">Formulario</a></li>
+        <li><a href="#chat">Chat</a></li>
+        <li><a href="#ia">IA</a></li>
+        <li><a href="#productos">Productos</a></li>
+    </ul>
+</nav>
+
+<!-- Header -->
+<header>
+    <h1>Veterinaria Amiga</h1>
+</header>
+
+<!-- Contenido principal -->
+<main>
+
+    <!-- Formulario de contacto / cita -->
+    <section id="formulario">
+        <h2>Agenda una cita</h2>
+        <form id="citaForm">
+            <input type="text" placeholder="Nombre de la mascota" required>
+            <input type="email" placeholder="Tu email" required>
+            <input type="text" placeholder="Teléfono" required>
+            <textarea placeholder="Motivo de la visita" rows="4" required></textarea>
+            <button type="submit">Enviar</button>
+        </form>
+    </section>
+
+    <!-- Chat simple -->
+    <section id="chat">
+        <h2>Chat con el veterinario</h2>
+        <div id="chatBox"></div>
+        <input type="text" id="chatInput" placeholder="Escribe tu mensaje..." style="width:70%;">
+        <button id="chatSend">Enviar</button>
+    </section>
+
+    <!-- Sección IA (simulada) -->
+    <section id="ia">
+        <h2>Asistente IA</h2>
+        <p>Pulsa el botón para recibir una respuesta rápida sobre cuidados de tu mascota.</p>
+        <button id="aiBtn">Preguntar a la IA</button>
+    </section>
+
+    <!-- Productos a la venta -->
+    <section id="productos">
+        <h2>Productos</h2>
+        <div class="grid">
+            <!-- Producto 1 -->
+            <div class="card">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==" alt="Producto 1" style="width:100%;height:150px;object-fit:cover;">
+                <h3>Alimento Adulto</h3>
+                <p>$25</p>
+                <button class="addToCart">Añadir</button>
+            </div>
+            <!-- Producto 2 -->
+            <div class="card">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==" alt="Producto 2" style="width:100%;height:150px;object-fit:cover;">
+                <h3>Collar de identificación</h3>
+                <p>$12</p>
+                <button class="addToCart">Añadir</button>
+            </div>
+            <!-- Producto 3 -->
+            <div class="card">
+                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==" alt="Producto 3" style="width:100%;height:150px;object-fit:cover;">
+                <h3>Juguete masticable</h3>
+                <p>$8</p>
+                <button class="addToCart">Añadir</button>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+    © 2025 Veterinaria Amiga – Todos los derechos reservados.
+</footer>
+
+<!-- Botón flotante para abrir/cerrar el chat -->
+<button id="chatToggleBtn" title="Abrir chat">&#9776;</button>
+
+<script>
+/* ---------- Chat ---------- */
+const chatBox = document.getElementById('chatBox');
+const chatInput = document.getElementById('chatInput');
+const chatSend = document.getElementById('chatSend');
+const chatToggleBtn = document.getElementById('chatToggleBtn');
+
+chatToggleBtn.addEventListener('click', () => chatBox.classList.toggle('show'));
+
+chatSend.addEventListener('click', enviarMensaje);
+chatInput.addEventListener('keypress', e => { if (e.key === 'Enter') enviarMensaje(); });
+
+function enviarMensaje() {
+    const texto = chatInput.value.trim();
+    if (!texto) return;
+    const userMsg = document.createElement('div');
+    userMsg.textContent = 'Tú: ' + texto;
+    chatBox.appendChild(userMsg);
+    chatInput.value = '';
+
+    // Simulación de respuesta IA (timeout)
+    setTimeout(() => {
+        const botMsg = document.createElement('div');
+        botMsg.textContent = 'Vet: ' + respuestaIA(texto);
+        chatBox.appendChild(botMsg);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }, 800);
+}
+
+function respuestaIA(texto) {
+    // Respuestas muy simples basadas en palabras clave
+    if (/comida|alimento/i.test(texto)) return 'Dale una dieta equilibrada y controla las porciones.';
+    if (/vacuna|vacuna/i.test(texto)) return 'Asegúrate de que tu mascota tenga sus vacunas al día.';
+    if (/parasito|parásito/i.test(texto)) return 'Usa antiparasitarios regularmente y revisa el pelaje.';
+    return 'Lo siento, no entiendo esa pregunta.';
+}
+
+/* ---------- Formulario ---------- */
+document.getElementById('citaForm').addEventListener('submit', e => {
+    e.preventDefault();
+    alert('¡Cita enviada! (En una aplicación real se enviaría al servidor).');
+    e.target.reset();
+});
+
+/* ---------- Carrito simple (localStorage) ---------- */
+const cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+document.querySelectorAll('.addToCart').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const card = btn.closest('.card');
+        const product = {
+            name: card.querySelector('h3').textContent,
+            price: parseFloat(card.querySelector('p').textContent.replace('$',''))
+        };
+        cart.push(product);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert(product.name + ' añadido al carrito.');
+    });
+});
+</script>
+</body>
+</html>
