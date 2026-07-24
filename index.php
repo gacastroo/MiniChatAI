@@ -49,10 +49,11 @@ declare(strict_types=1);
         }
 
         #reiniciar {
-            border: 0;
+            border: 1px solid #d1d5db;
             border-radius: 8px;
             padding: 10px 14px;
             cursor: pointer;
+            background: #ffffff;
         }
 
         #chat {
@@ -137,6 +138,25 @@ declare(strict_types=1);
             font-size: 14px;
         }
 
+        #selector-modelo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        #selector-modelo select {
+            flex: 1;
+            padding: 6px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font: inherit;
+            font-size: 13px;
+            background: white;
+        }
+
         @media (max-width: 640px) {
             form {
                 grid-template-columns: 1fr;
@@ -180,6 +200,13 @@ declare(strict_types=1);
             </button>
         </form>
 
+        <div id="selector-modelo">
+            <label for="modelo">Modelo:</label>
+            <select id="modelo">
+                <option value="auto">Auto (más rápido disponible)</option>
+            </select>
+        </div>
+
         <div id="estado"></div>
     </main>
 
@@ -188,8 +215,32 @@ declare(strict_types=1);
         const campoMensaje = document.getElementById('mensaje');
         const botonEnviar = document.getElementById('enviar');
         const botonReiniciar = document.getElementById('reiniciar');
+        const selectorModelo = document.getElementById('modelo');
         const chat = document.getElementById('chat');
         const estado = document.getElementById('estado');
+
+        async function cargarModelos() {
+            try {
+                const datos = await llamarApi({
+                    accion: 'listar_modelos',
+                });
+
+                selectorModelo.innerHTML =
+                    '<option value="auto">Auto (más rápido disponible)</option>';
+
+                if (datos.modelos && datos.modelos.length > 0) {
+                    datos.modelos.forEach((id) => {
+                        const opcion =
+                            document.createElement('option');
+                        opcion.value = id;
+                        opcion.textContent = id;
+                        selectorModelo.appendChild(opcion);
+                    });
+                }
+            } catch {
+                // Si falla, solo queda la opción "Auto"
+            }
+        }
 
         function agregarMensaje(texto, tipo, modelo = '') {
             const bloque = document.createElement('div');
@@ -211,6 +262,7 @@ declare(strict_types=1);
             botonEnviar.disabled = bloqueado;
             botonReiniciar.disabled = bloqueado;
             campoMensaje.disabled = bloqueado;
+            selectorModelo.disabled = bloqueado;
         }
 
         async function llamarApi(datos) {
@@ -254,11 +306,12 @@ declare(strict_types=1);
             campoMensaje.value = '';
             bloquear(true);
             estado.textContent =
-                'Buscando el modelo gratuito más rápido disponible...';
+                'Consultando al modelo...';
 
             try {
                 const datos = await llamarApi({
                     mensaje: texto,
+                    modelo: selectorModelo.value,
                 });
 
                 agregarMensaje(
@@ -268,7 +321,7 @@ declare(strict_types=1);
                 );
 
                 estado.textContent =
-                    `Prioridad utilizada: ${datos.prioridad}`;
+                    `Prioridad: ${datos.prioridad} · Modelo seleccionado: ${datos.seleccionado}`;
             } catch (error) {
                 agregarMensaje(
                     error.message,
@@ -315,6 +368,8 @@ declare(strict_types=1);
                 formulario.requestSubmit();
             }
         });
+
+        cargarModelos();
     </script>
 </body>
 </html>

@@ -52,12 +52,39 @@ if (($entrada['accion'] ?? '') === 'reiniciar') {
     exit;
 }
 
+if (($entrada['accion'] ?? '') === 'listar_modelos') {
+    try {
+        $selector = new SelectorModelosOpenRouter(
+            OPENROUTER_MODELS_URL,
+            OPENROUTER_API_KEY,
+            OPENROUTER_PRIORIDAD,
+            OPENROUTER_MAX_MODELOS,
+            OPENROUTER_CACHE_ARCHIVO,
+            OPENROUTER_CACHE_SEGUNDOS
+        );
+
+        $modelos = $selector->obtener();
+        $_SESSION['cache_modelos'] = $modelos;
+
+        echo json_encode(
+            ['modelos' => $modelos],
+            JSON_UNESCAPED_UNICODE
+        );
+
+        exit;
+    } catch (Throwable $e) {
+        responderError($e->getMessage(), 500);
+    }
+}
+
 /*
 |--------------------------------------------------------------------------
 | AQUÍ NO SE PEGA LA CLAVE
 |--------------------------------------------------------------------------
 | La clave se pega únicamente en config.php.
 */
+$modeloSeleccionado = trim((string) ($entrada['modelo'] ?? ''));
+
 if (
     OPENROUTER_API_KEY === '' ||
     str_contains(OPENROUTER_API_KEY, 'PEGA_AQUI') ||
@@ -104,20 +131,24 @@ if (count($_SESSION['historial']) > LLM_MAX_HISTORIAL) {
 }
 
 try {
-    $modelos = $_SESSION['cache_modelos'] ?? null;
+    if ($modeloSeleccionado !== '' && $modeloSeleccionado !== 'auto') {
+        $modelos = [$modeloSeleccionado];
+    } else {
+        $modelos = $_SESSION['cache_modelos'] ?? null;
 
-    if (!is_array($modelos) || $modelos === []) {
-        $selector = new SelectorModelosOpenRouter(
-            OPENROUTER_MODELS_URL,
-            OPENROUTER_API_KEY,
-            OPENROUTER_PRIORIDAD,
-            OPENROUTER_MAX_MODELOS,
-            OPENROUTER_CACHE_ARCHIVO,
-            OPENROUTER_CACHE_SEGUNDOS
-        );
+        if (!is_array($modelos) || $modelos === []) {
+            $selector = new SelectorModelosOpenRouter(
+                OPENROUTER_MODELS_URL,
+                OPENROUTER_API_KEY,
+                OPENROUTER_PRIORIDAD,
+                OPENROUTER_MAX_MODELOS,
+                OPENROUTER_CACHE_ARCHIVO,
+                OPENROUTER_CACHE_SEGUNDOS
+            );
 
-        $modelos = $selector->obtener();
-        $_SESSION['cache_modelos'] = $modelos;
+            $modelos = $selector->obtener();
+            $_SESSION['cache_modelos'] = $modelos;
+        }
     }
 
     // Liberar el bloqueo de sesión ANTES de la llamada HTTP larga
@@ -160,6 +191,7 @@ echo json_encode(
         'respuesta' => $resultado['texto'],
         'modelo' => $resultado['modelo'],
         'prioridad' => OPENROUTER_PRIORIDAD,
+        'seleccionado' => $modeloSeleccionado ?: 'auto',
     ],
     JSON_UNESCAPED_UNICODE
 );
