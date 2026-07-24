@@ -1,235 +1,57 @@
-# MiniChatGPT
+# Chat IA con OpenRouter
 
-MiniChatGPT es una aplicación web de chat conversacional que se comunica con un modelo de lenguaje a través de la API de OpenRouter. Proyecto docente construido con PHP 8, POO y MVC, sin frameworks, sin Composer y sin base de datos.
-
-## Captura
-
-```
-┌───────────────────────────────────────────────┐
-│  MiniChatGPT                     [Nueva conv] │
-│  Chat construido con PHP y OpenRouter         │
-├───────────────────────────────────────────────┤
-│                                               │
-│  ┌──────────────────────────────────┐         │
-│  │ Asistente                        │         │
-│  │ Hola. Soy MiniChatGPT.           │         │
-│  └──────────────────────────────────┘         │
-│              ┌────────────────────────────┐   │
-│              │ Tú                        │   │
-│              │ ¿Qué puedes hacer?        │   │
-│              └────────────────────────────┘   │
-│  ┌──────────────────────────────────┐         │
-│  │ Asistente                        │         │
-│  │ Puedo responder preguntas,       │         │
-│  │ ayudarte con código, etc.       │         │
-│  └──────────────────────────────────┘         │
-│                                               │
-├───────────────────────────────────────────────┤
-│ [Escribe un mensaje...]           [Enviar]   │
-│ Escribiendo…                                 │
-└───────────────────────────────────────────────┘
-```
-
-## Funcionalidades
-
-- **Envío sin recarga**: los mensajes se envían con `fetch` sin recargar la página.
-- **Burbuja inmediata**: el mensaje del usuario aparece al instante, sin esperar la respuesta.
-- **Indicador de escritura**: muestra "Escribiendo…" mientras OpenRouter genera la respuesta.
-- **Enter y Mayús+Enter**: Enter envía; Mayús+Enter inserta un salto de línea.
-- **Nueva conversación**: un botón reinicia el historial de la sesión.
-- **Errores visibles**: los errores de red, API o validación se muestran como burbujas rojas.
-- **Historial en sesión**: la conversación se conserva en `$_SESSION` (máximo 20 mensajes + sistema).
-- **Escapado seguro**: todo texto se inserta con `textContent`, nunca con `innerHTML`.
-
-## Stack
-
-| Capa | Tecnología |
-|------|-----------|
-| Backend | PHP 8, POO, MVC |
-| Frontend | HTML5, Tailwind CSS (CDN), JavaScript nativo |
-| API | OpenRouter (`https://openrouter.ai/api/v1/chat/completions`) |
-| HTTP | cURL nativo de PHP |
-| Comunicación | `fetch` (JSON) |
-| Sesión | `$_SESSION` de PHP |
-| Dependencias | Ninguna (sin Composer, sin npm, sin frameworks) |
-
-## Estructura del proyecto
-
-```
-minichatgpt/
-├── public/
-│   ├── index.php          # Punto de entrada (renderiza la vista)
-│   ├── chat.php           # Endpoint JSON para las peticiones AJAX
-│   └── assets/
-│       └── app.js         # Lógica del lado del cliente (fetch, DOM)
-├── app/
-│   ├── Config/
-│   │   └── Config.php     # Lectura del archivo .env
-│   ├── Controllers/
-│   │   └── ChatController.php  # Valida entrada, coordina Modelo y Servicio
-│   ├── Models/
-│   │   └── Conversacion.php    # Gestiona el historial en $_SESSION
-│   ├── Services/
-│   │   └── ClienteLLM.php     # Llama a OpenRouter con cURL
-│   └── Views/
-│       └── chat.view.php      # Plantilla HTML de la interfaz
-├── scripts/
-│   └── backup.ps1         # Script de copia de seguridad (Windows)
-├── .env                   # Clave de API y modelo (NO subir a Git)
-├── .env.example           # Plantilla para .env
-├── .gitignore
-├── AGENTS.md              # Instrucciones para asistentes de IA
-├── PRD.md                 # Documento de requisitos
-└── README.md              # Este archivo
-```
+Chat con modelos gratuitos conversacionales via OpenRouter.
 
 ## Requisitos
 
-- PHP 8.0 o superior
-- Extensión cURL habilitada
-- Navegador web moderno
-- Conexión a Internet
-- Cuenta en [OpenRouter](https://openrouter.ai) con una clave de API
+- PHP 8+ con extension cURL
+- Clave de API de [OpenRouter](https://openrouter.ai)
 
-## Instalación
+## Instalacion
 
-### 1. Clonar o copiar el proyecto
+1. Abre `config.php`.
+2. Busca la linea:
+   ```php
+   define('OPENROUTER_API_KEY', 'PEGA_AQUI_TU_NUEVA_CLAVE');
+   ```
+3. Pega una **clave nueva** de OpenRouter entre las comillas.
+4. Borra `cache_modelos_openrouter.json` si existe.
 
-```bash
-git clone <url-del-repositorio>
-cd minichatgpt
+## Uso
+
+```powershell
+php -S 127.0.0.1:8000
 ```
 
-O descarga los archivos y colócalos en `C:\xampp\htdocs\minichatgpt` si usas XAMPP.
+Abre `http://127.0.0.1:8000`.
 
-### 2. Configurar el archivo .env
+## Selector de modelos
 
-Copia el archivo de ejemplo:
+Al cargar la pagina se obtienen los modelos gratuitos disponibles. Puedes elegir entre:
 
-```bash
-cp .env.example .env
-```
+- **Auto** (mas rapido disponible): OpenRouter selecciona el mejor segun la prioridad.
+- **Un modelo concreto**: fuerza el uso de ese modelo en todos los mensajes de la sesion.
 
-Edita `.env` y completa los valores:
+## Filtro de modelos
 
-```env
-OPENROUTER_API_KEY=sk-or-tu-clave-aqui
-OPENROUTER_MODEL=openrouter/free
-```
+El selector excluye automaticamente modelos de:
 
-> La clave se obtiene en [https://openrouter.ai/keys](https://openrouter.ai/keys).  
-> El archivo `.env` está en `.gitignore` y nunca debe subirse al repositorio.
+- Seguridad/moderacion
+- Embeddings
+- Reranking y clasificacion
+- OCR y voz
 
-### 3. Iniciar el servidor
+Solo conserva modelos gratuitos con entrada y salida de texto y parametros normales de generacion.
 
-```bash
-php -S localhost:8000 -t public
-```
+## Prioridad (config.php)
 
-La opción `-t public` expone únicamente la carpeta `public/`.
+| Valor | Comportamiento |
+|---|---|
+| `latency` | Menor tiempo hasta empezar la respuesta |
+| `throughput` | Mas tokens generados por segundo |
 
-### 4. Abrir la aplicación
+## Rendimiento
 
-Visita [http://localhost:8000](http://localhost:8000) en el navegador.
-
-## Cambiar de modelo
-
-Edita `OPENROUTER_MODEL` en `.env`. No hace falta modificar ningún otro archivo.
-
-```env
-OPENROUTER_MODEL=nvidia/nemotron-3-ultra:free
-```
-
-Modelos gratuitos recomendados (julio 2026):
-- `openrouter/free` — enrutador automático
-- `nvidia/nemotron-3-ultra:free` — 1M de contexto, potente
-- `google/gemma-4-26b-a4b:free` — rápido y fiable
-- `openai/gpt-oss-20b:free` — versátil
-
-## Probar con curl
-
-```bash
-curl -X POST http://localhost:8000/chat.php \
-  -H "Content-Type: application/json" \
-  -d '{"mensaje":"Hola"}'
-```
-
-Respuesta esperada:
-
-```json
-{"ok":true,"respuesta":"¡Hola! ¿En qué puedo ayudarte?"}
-```
-
-## Contrato de la API interna
-
-### Enviar un mensaje
-
-```
-POST /chat.php
-Content-Type: application/json
-
-{"mensaje": "Texto del usuario"}
-```
-
-Respuesta correcta:
-```json
-{"ok": true, "respuesta": "Texto generado por el modelo"}
-```
-
-Respuesta con error:
-```json
-{"ok": false, "error": "Mensaje de error comprensible"}
-```
-
-### Reiniciar la conversación
-
-```
-POST /chat.php
-Content-Type: application/json
-
-{"accion": "reiniciar"}
-```
-
-Respuesta:
-```json
-{"ok": true}
-```
-
-### Códigos HTTP
-
-| Código | Significado |
-|--------|-------------|
-| 200 | Operación correcta |
-| 400 | Petición no válida |
-| 401 | Clave de OpenRouter incorrecta |
-| 429 | Límite de peticiones alcanzado |
-| 500 | Error interno o de configuración |
-| 502 | Respuesta inválida del proveedor |
-| 504 | Tiempo de espera agotado |
-
-## Manejo de errores
-
-La aplicación muestra mensajes comprensibles en estos casos:
-
-- Falta la clave de API o el archivo `.env`
-- Clave de API incorrecta (401)
-- Límite de peticiones alcanzado (429) — sugiere esperar unos segundos
-- Tiempo de espera agotado (504)
-- Error de conexión con OpenRouter
-- OpenRouter devuelve JSON no válido
-- La respuesta del modelo está vacía o malformada
-- El mensaje del usuario está vacío
-- El mensaje del usuario supera los 2000 caracteres
-
-## Limitaciones conocidas
-
-- El historial solo dura lo que dura la sesión de PHP. Al cerrar el navegador se pierde.
-- No hay base de datos ni historial permanente entre sesiones.
-- No hay streaming palabra por palabra: la respuesta llega completa.
-- No se admiten archivos, imágenes ni Markdown enriquecido.
-- Los modelos gratuitos de OpenRouter pueden estar saturados (error 429).
-- La velocidad de respuesta depende del proveedor que OpenRouter seleccione.
-
-## Autor
-
-Realizado por **Guillermo Castro Abarca**.
+- Los modelos se cachean en sesion para evitar consultar el catalogo en cada mensaje.
+- El bloqueo de sesion se libera durante la llamada HTTP a OpenRouter para que varias pestanas del mismo usuario no se encolen.
+- Cache de archivo: 1 hora (configurable en `OPENROUTER_CACHE_SEGUNDOS`).
